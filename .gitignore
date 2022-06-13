@@ -2,4 +2,4 @@ run
 run.exe
 main.c
 valgrind-out.txt
-VLC.h
+VLC.sh
