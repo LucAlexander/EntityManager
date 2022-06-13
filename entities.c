@@ -41,6 +41,8 @@ void entity_data_free(entity_data* data){
 		vu64_tFree(mu32_maskRef(&data->masks, i));
 	}
 	free(keys);
+	qu32_tFree(&data->eid_backlog);
+	mu32_maskFree(&data->masks);
 	mu32_u32Free(&data->ent2arch);
 }
 
@@ -52,6 +54,7 @@ void freeArchetype(archetype_v2* e){
 	}
 	mat_tFree(&e->data);
 	vu64_tFree(&e->mask);
+	vu32_tFree(&e->ids);
 }
 
 uint32_t form_entity(entity_data* data){
@@ -141,6 +144,7 @@ void addComponentToExistingEntity(mu32_u32* ent2arch, varch_t* archetypes, arche
 		popcount += maskContainsBit(&newmask, t);
 	}
 	if (maskContainsBit(&newmask, cid)){
+		vu64_tFree(&newmask);
 		vec_tSet(mat_tRef(&arch->data, index), popcount, component_data);
 		return;
 	}
@@ -161,6 +165,7 @@ uint8_t swapToExistingArchetype(mu32_u32* ent2arch, varch_t* archetypes, archety
 			uint32_t eid = vu32_tRemove(&oldArch->ids, index);
 			vu32_tPushBack(&existingarc->ids, eid);
 			mu32_u32Push(ent2arch, eid, t);
+			vu64_tFree(newmask);
 			return 1;
 		}
 	}
@@ -202,8 +207,10 @@ uint8_t removeComponentFromEntity(mu32_u32* ent2arch, varch_t* archetypes, arche
 		vec_t* entity = mat_tRef(&arch->data, index);
 		vec_tRemoveInOrder(entity, popcount);
 		swapToExistingArchetype(ent2arch, archetypes,arch, &newmask, index);
+		vu64_tFree(&newmask);
 		return 1;
 	}
+	vu64_tFree(&newmask);
 	return 0;
 }
 
