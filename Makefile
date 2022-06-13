@@ -2,7 +2,7 @@ CC=gcc
 CCWIN=x86_64-w64-mingw32-gcc
 CFLAGS=-lm
 CDEBUGFLAGS=-Wall -g
-FILES=main.c systems.h systems.c asciiEsc.h entities.h entities.c hashMap.h hashMap.c vector.h vector.c memarena.h memarena.c bitmasks.h bitmasks.c
+FILES=main.c cflags.h cflags.c systems.h systems.c asciiEsc.h entities.h entities.c hashMap.h hashMap.c vector.h vector.c memarena.h memarena.c bitmasks.h bitmasks.c
 OUT=run
 
 compile:

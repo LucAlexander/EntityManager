@@ -18,11 +18,11 @@ void freeArchetype(archetype_v2* e);
 
 VECTOR(varch_t, archetype_v2)
 VECTOR(qu32_t, uint32_t)
-HASHMAP(mu32_mask, uint32_t, vu64_t)
+HASHMAP(mu32_mask, uint32_t, uint64_t)
 HASHMAP(mu32_u32, uint32_t, uint32_t)
 
 typedef enum ENTITY_FLAGS{
-	ENTITY_DEACTIVATED=0
+	ENTITY_DEACTIVATED=1
 }ENTITY_FLAGS;
 
 typedef struct entity_data{

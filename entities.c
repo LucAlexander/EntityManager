@@ -1,5 +1,7 @@
 #include "entities.h"
 #include "asciiEsc.h"
+#include "cflags.h"
+
 #include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -8,7 +10,7 @@ VECTOR_SOURCE(varch_t, archetype_v2)
 VECTOR_SOURCE(vec_t, void*)
 VECTOR_SOURCE(mat_t, vec_t)
 VECTOR_SOURCE(qu32_t, uint32_t)
-HASHMAP_SOURCE(mu32_mask, uint32_t, vu64_t, hashI)
+HASHMAP_SOURCE(mu32_mask, uint32_t, uint64_t, hashI)
 HASHMAP_SOURCE(mu32_u32, uint32_t, uint32_t, hashI)
 
 void entity_data_init(entity_data* data){
@@ -36,11 +38,6 @@ void entity_data_free(entity_data* data){
 		freeArchetype(e);
 	}
 	varch_tFree(&data->archetypes);
-	uint32_t* keys = mu32_maskGetKeySet(&data->masks);
-	for (i = 0;i<data->masks.size;++i){
-		vu64_tFree(mu32_maskRef(&data->masks, i));
-	}
-	free(keys);
 	qu32_tFree(&data->eid_backlog);
 	mu32_maskFree(&data->masks);
 	mu32_u32Free(&data->ent2arch);
@@ -68,16 +65,16 @@ uint32_t form_entity(entity_data* data){
 	vu32_tPushBack(&def->ids, id);
 	mu32_u32Push(&data->ent2arch, id, 0);
 	if (!mu32_maskContains(&data->masks, id)){
-		mu32_maskPush(&data->masks, id, createMask(0));
+		mu32_maskPush(&data->masks, id, 0);
 		return id;
 	}
-	vu64_tClear(mu32_maskRef(&data->masks, id));
+	*mu32_maskRef(&data->masks, id) = 0;
 	return id; 
 }
 
 void destroy_entity(entity_data* data, uint32_t eid){
-	vu64_t* mask = mu32_maskRef(&data->masks, eid);
-	maskAddBit(mask, ENTITY_DEACTIVATED);
+	uint64_t* mask = mu32_maskRef(&data->masks, eid);
+	*mask = bit_on(*mask, ENTITY_DEACTIVATED);
 }
 
 void purge(entity_data* data){
@@ -85,8 +82,8 @@ void purge(entity_data* data){
 	uint32_t* keys = mu32_maskGetKeySet(&data->masks);
 	for (i = 0;i<data->masks.size;++i){
 		uint32_t eid = keys[i];
-		vu64_t* mask = mu32_maskRef(&data->masks, i);
-		if (maskContainsBit(mask, ENTITY_DEACTIVATED)){
+		uint64_t* mask = mu32_maskRef(&data->masks, i);
+		if (bit_check(*mask, ENTITY_DEACTIVATED)){
 			purgeEntity(data, eid);
 		}
 	}
@@ -231,10 +228,12 @@ void entity_data_display(entity_data* data){
 	printf(" "A_YELLOW_F"█ "A_GREEN_F"█ entity id, archetype id, mask\n"A_RESET);
 	while (mu32_u32IteratorHasNext(&it)){
 		mu32_u32Result r = mu32_u32IteratorNext(&it);
-		vu64_t mask = varch_tRef(&data->archetypes, r.val)->mask;
-		printf(" "A_YELLOW_F"█ "A_GREEN_F"█ "A_RESET"%d"A_GREEN_F", "A_RESET"%d"A_GREEN_F", "A_RESET, r.key, r.val);
-		maskDisplay(&mask);
-		printf(""A_RESET"");
+		if (entity_exists(data, r.key)){
+			vu64_t mask = varch_tRef(&data->archetypes, r.val)->mask;
+			printf(" "A_YELLOW_F"█ "A_GREEN_F"█ "A_RESET"%d"A_GREEN_F", "A_RESET"%d"A_GREEN_F", "A_RESET, r.key, r.val);
+			maskDisplay(&mask);
+			printf(""A_RESET"");
+		}
 	}
 	printf(A_YELLOW_F" █▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄\n"A_RESET);
 }
