@@ -14,7 +14,7 @@ system_t system_init(void f(uint32_t, vec_t*), uint32_t n, ...){
 	for (i = 0;i<n;++i){
 		maskAddBit(&sys.mask, va_arg(v, uint32_t));
 	}
-	//TODO set default mask filters for entity flags
+	system_add_filter(&sys, 1, ENTITY_DEACTIVATED);
 	va_end(v);
 	return sys;
 }
