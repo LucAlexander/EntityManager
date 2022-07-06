@@ -32,6 +32,7 @@ typedef struct entity_data{
 	qu32_t eid_backlog;
 	mu32_mask masks; // entity flags
 	mu32_u32 ent2arch;
+	mu32_u32 ent2layer;
 }entity_data;
 
 void entity_data_display(entity_data* data);
@@ -57,6 +58,9 @@ void swapToNewArchetype(mu32_u32* ent2arch, varch_t* archetypes, archetype_v2* a
 
 void untether_component(entity_data*, uint32_t eid, uint32_t cid);
 uint8_t removeComponentFromEntity(mu32_u32* ent2arch, varch_t* archetypes, archetype_v2* arch, uint32_t cid, uint32_t index);
+
+int32_t get_entity_layer(entity_data*, uint32_t eid);
+void set_entity_layer(entity_data*, uint32_t eid, uint32_t layer);
 
 /* data[
  *	{archetype mask : [component list], [component list]}

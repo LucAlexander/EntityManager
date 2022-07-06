@@ -19,8 +19,9 @@ void system_add_filter(system_t* sys, uint32_t n, ...);
 void system_remove_filter(system_t* sys, uint32_t n, ...);
 void system_add_magnet(system_t* sys, uint32_t n, ...);
 void system_remove_magnet(system_t* sys, uint32_t n, ...);
-void system_run(system_t* sys, struct entity_data* medium);
+void system_run(system_t* sys, struct entity_data* medium, uint32_t layer);
 void system_free(system_t* sys);
 uint8_t system_filter(system_t* sys, uint64_t entity_mask);
+uint8_t system_layer_check(uint32_t layer, struct entity_data* medium, uint32_t eid);
 
 #endif

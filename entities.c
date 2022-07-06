@@ -20,6 +20,7 @@ void entity_data_init(entity_data* data){
 	data->entity_count = 0;
 	data->masks = mu32_maskInit();
 	data->ent2arch = mu32_u32Init();
+	data->ent2layer = mu32_u32Init();
 	addDefaultArchetype(data);
 }
 
@@ -41,6 +42,7 @@ void entity_data_free(entity_data* data){
 	qu32_tFree(&data->eid_backlog);
 	mu32_maskFree(&data->masks);
 	mu32_u32Free(&data->ent2arch);
+	mu32_u32Free(&data->ent2layer);
 }
 
 void freeArchetype(archetype_v2* e){
@@ -64,6 +66,7 @@ uint32_t form_entity(entity_data* data){
 	}
 	vu32_tPushBack(&def->ids, id);
 	mu32_u32Push(&data->ent2arch, id, 0);
+	mu32_u32Push(&data->ent2layer, id, -1);
 	if (!mu32_maskContains(&data->masks, id)){
 		mu32_maskPush(&data->masks, id, 0);
 		return id;
@@ -101,6 +104,7 @@ uint8_t purgeEntity(entity_data* data, uint32_t eid){
 			vec_tFree(mat_tRefTrusted(&arch->data, i));
 			mat_tRemove(&arch->data, i);
 			mu32_u32Pop(&data->ent2arch, eid);
+			mu32_u32Pop(&data->ent2layer, eid);
 			return 1;
 		}
 	}
@@ -209,6 +213,14 @@ uint8_t removeComponentFromEntity(mu32_u32* ent2arch, varch_t* archetypes, arche
 	}
 	vu64_tFree(&newmask);
 	return 0;
+}
+
+int32_t get_entity_layer(entity_data* data, uint32_t eid){
+	return mu32_u32Get(&data->ent2layer, eid).val;
+}
+
+void set_entity_layer(entity_data* data, uint32_t eid, uint32_t layer){
+	mu32_u32Push(&data->ent2layer, eid, layer);
 }
 
 void entity_data_display(entity_data* data){
