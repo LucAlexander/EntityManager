@@ -11,10 +11,10 @@ typedef struct system_t{
 	vu64_t mask;
 	uint64_t filter;
 	uint64_t magnet;
-	void (*func)(uint32_t, struct vec_t*);
+	void (*func)(struct entity_data*, uint32_t, struct vec_t*);
 }system_t;
 
-system_t system_init(void f(uint32_t, struct vec_t*), uint32_t n, ...);
+system_t system_init(void f(struct entity_data*, uint32_t, struct vec_t*), uint32_t n, ...);
 void system_add_filter(system_t* sys, uint32_t n, ...);
 void system_remove_filter(system_t* sys, uint32_t n, ...);
 void system_add_magnet(system_t* sys, uint32_t n, ...);

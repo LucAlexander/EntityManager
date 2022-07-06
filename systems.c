@@ -2,7 +2,7 @@
 #include "entities.h"
 #include "cflags.h"
 
-system_t system_init(void f(uint32_t, vec_t*), uint32_t n, ...){
+system_t system_init(void f(entity_data*, uint32_t, vec_t*), uint32_t n, ...){
 	system_t sys;
 	sys.mask = vu64_tInit();
 	sys.filter = 0;
@@ -75,7 +75,7 @@ void system_run(system_t* sys, entity_data* medium, uint32_t layer){
 			for (entity = 0;entity<arch->data.size;++entity){
 				uint32_t eid = vu32_tGet(&arch->ids, entity);
 				if (system_filter(sys, mu32_maskGet(&medium->masks, eid).val)&&system_layer_check(layer, medium, eid)){
-					sys->func(vu32_tGet(&arch->ids, entity), (vec_t*)mat_tRef(&arch->data, entity));
+					sys->func(medium, vu32_tGet(&arch->ids, entity), (vec_t*)mat_tRef(&arch->data, entity));
 				}
 			}
 		}
